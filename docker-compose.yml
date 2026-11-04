@@ -1,0 +1,39 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: mathpractice
+      POSTGRES_USER: mathpractice
+      POSTGRES_PASSWORD: mathpractice
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U mathpractice -d mathpractice"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    environment:
+      DATABASE_URL: postgresql+asyncpg://mathpractice:mathpractice@db:5432/mathpractice
+      FRONTEND_ORIGIN: http://localhost:5173
+      GOOGLE_API_KEY: ${GOOGLE_API_KEY:-}
+      GOOGLE_MODEL: ${GOOGLE_MODEL:-gemini-flash-lite-latest}
+      TEXTBOOK_PDF_PATH: /data/source/Maths_Textbook.pdf
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./data:/data:ro
+
+  frontend:
+    build: ./frontend
+    environment:
+      VITE_API_BASE_URL: http://localhost:8000/api/v1
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend

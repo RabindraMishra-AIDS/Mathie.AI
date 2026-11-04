@@ -1,0 +1,11 @@
+{
+  "source": "data/source/Maths_Textbook.pdf",
+  "chapter": "Linear Equations in Two Variables",
+  "chunks": [
+    { "practice_set": 1, "pdf_page_start": 11, "pdf_page_end": 14 },
+    { "practice_set": 2, "pdf_page_start": 15, "pdf_page_end": 19 },
+    { "practice_set": 3, "pdf_page_start": 20, "pdf_page_end": 26 },
+    { "practice_set": 4, "pdf_page_start": 27, "pdf_page_end": 29 },
+    { "practice_set": 5, "pdf_page_start": 30, "pdf_page_end": 36 }
+  ]
+}
