@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -114,6 +115,9 @@ class ExerciseVectorStore:
             reader.pages[page_number - 1].extract_text() or ""
             for page_number in range(start, end + 1)
         ).strip()
+        context = re.split(
+            r"\bPractice\s+Set\b", context, maxsplit=1, flags=re.IGNORECASE
+        )[0].strip()
         if not context:
             raise LookupError("The requested textbook pages contain no readable text.")
         return context

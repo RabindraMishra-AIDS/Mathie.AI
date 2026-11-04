@@ -57,6 +57,9 @@ class GeminiLLMClient(LLMClient):
             f"{count} new practice problems matching its concepts, pattern, and "
             f"difficulty ({context.difficulty}). Every question must use at least "
             f"one of these exercise patterns: {', '.join(context.pattern_keywords)}. "
+            "Create original problems by changing the numbers, names, and scenario "
+            "details. Do not copy, paraphrase, or reproduce any textbook practice "
+            "set question or worked example. Do not mention the textbook. "
             "Include a correct worked solution and a short concept explanation for "
             "each. Do not use knowledge not supported by the context. Return JSON "
             'only: {"problems":[{"question":"...","solution":"...",'

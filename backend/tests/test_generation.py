@@ -36,6 +36,16 @@ def test_context_is_scoped_to_exercise() -> None:
     assert "graph" in chunk.context.lower()
 
 
+def test_practice_set_context_excludes_textbook_questions() -> None:
+    chunk = ExerciseVectorStore().search(
+        "Linear Equations in Two Variables", exercise_id=5
+    )
+
+    assert "Practice Set 1.5" not in chunk.context
+    assert "Two numbers differ by 3" not in chunk.context
+    assert "application of simultaneous equations" in chunk.context.lower()
+
+
 def test_generation_uses_fake_client_and_verifies_output() -> None:
     response = PracticeGenerator(ExerciseVectorStore(), FakeLLMClient()).generate(
         "Linear Equations in Two Variables", exercise=1, count=2
@@ -179,3 +189,27 @@ def test_provider_accepts_json_fenced_in_markdown(
     assert client.generate(chunk, count=1) == [
         ("Solve x + y = 2", "x=1, y=1", "Use substitution.")
     ]
+
+
+def test_provider_prompt_requires_original_problems(
+    monkeypatch: MonkeyPatch,
+) -> None:
+    client = GeminiLLMClient(Settings(google_api_key="test-key"))
+    prompts: list[str] = []
+    monkeypatch.setattr(
+        client,
+        "_request",
+        lambda prompt, mime_type="text/plain": (
+            prompts.append(prompt)
+            or '{"problems":[{"question":"Solve x + y = 2",'
+            '"solution":"x=1, y=1","explanation":"Use substitution."}]}'
+        ),
+    )
+    chunk = ExerciseVectorStore().search(
+        "Linear Equations in Two Variables", exercise_id=5
+    )
+
+    client.generate(chunk, count=1)
+
+    assert "Create original problems" in prompts[0]
+    assert "Do not copy, paraphrase, or reproduce" in prompts[0]
